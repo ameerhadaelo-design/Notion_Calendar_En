@@ -42,6 +42,23 @@ input,select{background:var(--bg);border:1px solid var(--grid);border-radius:8px
 .ro{left:calc(50% - 9px);top:-30px;cursor:grab}
 .dl{right:-9px;top:-9px;cursor:pointer}
 .sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--grid);cursor:pointer;padding:0}
+#frame{position:relative}
+#mv{position:absolute;left:-8px;top:-8px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;text-align:center;line-height:24px;font-size:13px;cursor:move;touch-action:none;z-index:6;opacity:.9;user-select:none}
+body.retro #tb{cursor:move;touch-action:none}
+#ph{position:relative;margin-bottom:8px}
+#hw:not(.has) #hd{display:none}
+#hw.has #hd{border-radius:var(--r)}
+#ph.on{overflow:hidden;border-radius:var(--r);cursor:grab;touch-action:none;background:var(--grid)}
+.hi{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat;pointer-events:none}
+.hc{position:absolute;bottom:6px;right:6px;display:flex;gap:4px;z-index:3}
+#hw.has{display:grid;margin-bottom:8px}
+#hw.has>*{grid-area:1/1;margin:0!important}
+#hw.has #top{position:relative;z-index:2;align-self:start;background:none!important;padding:8px 10px;pointer-events:none;color:var(--ht,#fff);text-shadow:var(--hs,0 1px 3px #0005)}
+#hw.has #top>*{pointer-events:auto}
+#hw.has #top .b{text-shadow:none}
+.hc .b{background:#fffd;color:#333;border:0}
+body.retro #ph.on,body.retro #hw.has #hd{border-radius:0}
+#rz{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 50%,var(--accent) 50%);border-radius:0 0 var(--r) 0;z-index:5;opacity:.85}
 #tb{display:none}
 body.retro #frame{border:2px solid var(--accent);border-radius:var(--r);background:var(--bg)}
 body.retro #tb{display:flex;align-items:center;gap:10px;background:var(--accent);padding:10px 14px;border-radius:calc(var(--r) - 2px) calc(var(--r) - 2px) 0 0}
@@ -66,11 +83,13 @@ body.retro .ev{text-transform:uppercase;font-size:.58rem}
 #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--accent);color:#fff;padding:6px 14px;border-radius:999px;font-size:.8rem;display:none;z-index:60}
 </style></head><body>
 <div id="frame"><div id="tb"><b>●</b><b>■</b><b>▲</b><i></i></div><div id="body">
+<div id="ph"></div>
+<div id="hw"><div id="hd"></div>
 <div id="top">
   <button class="b" id="pv">‹</button><div id="ttl"></div><button class="b" id="nx">›</button>
   <span class="sp"></span>
   <button class="b" id="td">Today</button><button class="b a" id="ast">＋ Sticker</button><button class="b" id="gr">⚙</button><span id="cs" style="font-size:.7rem;opacity:.6"></span>
-</div>
+</div></div>
 <div id="set">
   <label>Style <select data-s="style"><option value="plain">Classic</option><option value="retro">Retro window</option></select></label>
   <label>Theme <select data-s="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
@@ -85,9 +104,9 @@ body.retro .ev{text-transform:uppercase;font-size:.58rem}
   <label>Corners <button class="b" id="cur">Curved</button><button class="b" id="sqr">Square</button></label>
   <label><input type="checkbox" data-s="grid"> Grid</label>
   <label><input type="checkbox" data-s="title"> Title</label>
-  <label>Day height <input type="range" min="56" max="160" data-s="ch"></label>
+  <label>Day height <input type="range" min="40" max="600" data-s="ch"></label><label>Scale <input type="range" min="30" max="400" data-s="sc"></label><label>Photo height <input type="range" min="40" max="500" data-s="hh"></label><label>Header color <button class="sw" id="hcs"></button></label><button class="b" id="hcx">No color</button><button class="b" id="fit">Fit to window</button>
 </div>
-<div id="wrap"><div id="wk"></div><div id="grid"></div><div id="st"></div></div></div></div>
+<div id="wrap"><div id="wk"></div><div id="grid"></div><div id="st"></div></div></div><div id="rz" title="Drag to resize"></div><div id="mv" title="Drag to move">✥</div></div>
 
 <div id="ed"><div class="card">
   <b id="edd"></b><div id="evl"></div>
@@ -95,19 +114,19 @@ body.retro .ev{text-transform:uppercase;font-size:.58rem}
   <div class="row"><button class="b" id="phb"></button><button class="b" id="phr">Remove photo</button><span class="sp"></span><button class="b" id="cl">Done</button></div>
 </div></div>
 <div id="cpw"><div class="card" style="width:min(260px,100%);text-align:center"><b id="cpt"></b><canvas id="wheel" width="180" height="180"></canvas><label class="row" style="justify-content:center">Brightness <input type="range" id="val" min="0" max="100"></label><div class="row" style="justify-content:center"><input id="hex" maxlength="7" style="width:90px;text-align:center"><button class="b a" id="cpd">Done</button></div></div></div>
-<input type="file" accept="image/*" id="pf" hidden><input type="file" accept="image/*" id="sf" hidden>
+<input type="file" accept="image/*" id="pf" hidden><input type="file" accept="image/*" id="hf" hidden><input type="file" accept="image/*" id="sf" hidden>
 <div id="toast"></div>
 
 <script>
 const $=s=>document.querySelector(s),K='cw1';
-let S={style:'plain',theme:'system',font:"'DM Sans',system-ui,sans-serif",shape:'♥',round:true,grid:true,title:true,wk:'short',ch:84,c:{},ev:{},ph:{},st:{}};
+let S={style:'plain',hd:{},hh:90,cw:0,sc:100,theme:'system',font:"'DM Sans',system-ui,sans-serif",shape:'♥',round:true,grid:true,title:true,wk:'short',ch:84,c:{},ev:{},ph:{},st:{}};
 try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
 let cur=new Date();cur.setDate(1);let sel=null,dk=null;
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pad=n=>String(n).padStart(2,'0'),key=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`,mk=()=>`${cur.getFullYear()}-${pad(cur.getMonth()+1)}`;
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2600)}
 function save(){S.ts=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){if(!DB)toast('Storage full – remove some photos')}push()}
-function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;document.body.classList.toggle('retro',S.style==='retro');
+function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'px':'';fr.style.zoom=S.sc/100;fr.style.left=(S.ox||0)+'px';fr.style.top=(S.oy||0)+'px';
   r.style.setProperty('--font',S.font);r.style.setProperty('--ch',S.ch+'px');r.style.setProperty('--r',S.round?'14px':'0px');
   ['accent','bg','fg','grid'].forEach(k=>S.c[k]?r.style.setProperty('--'+k,S.c[k]):r.style.removeProperty('--'+k));paintSw()}
 function shrink(f,max){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/webp',.82))};im.src=r.result};r.readAsDataURL(f)})}
@@ -120,7 +139,7 @@ function render(){
     h+=`<div class="day${p?' has':''}${isT?' today':''}" data-k="${k}"${p?` style="background-image:url('${p}')"`:''}><span class="n${isT?' td':''}">${d}</span>`
     +e.slice(0,3).map(x=>`<div class="ev"><i>${S.shape}</i>${x.tm?x.tm+' ':''}${esc(x.t)}</div>`).join('')+(e.length>3?`<div class="ev">+${e.length-3} more</div>`:'')+'</div>'}
   for(let i=0;i<(7-(first+n)%7)%7;i++)h+='<div class="day blank"></div>';
-  $('#grid').className=S.grid?'':'nogrid';$('#grid').innerHTML=h;drawSt()}
+  $('#grid').className=S.grid?'':'nogrid';$('#grid').innerHTML=h;drawSt();drawHd()}
 function drawSt(){$('#st').innerHTML=(S.st[mk()]||[]).map(s=>`<div class="s${s.id===sel?' sel':''}" data-id="${s.id}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h!=null?s.h+'%':'auto'};transform:rotate(${s.r}deg)"><img src="${s.src}" alt=""><div class="h ro">↻</div><div class="h dl">×</div><div class="h rs"></div><div class="h rw"></div><div class="h rh"></div></div>`).join('')}
 /* stickers */
 $('#st').addEventListener('pointerdown',e=>{
@@ -179,7 +198,7 @@ function drawWheel(){const n=wc.width,im=wx.createImageData(n,n);
   for(let y=0;y<n;y++)for(let x=0;x<n;x++){const dx=x-WR+.5,dy=y-WR+.5,r=Math.hypot(dx,dy);if(r<=WR){const[a,b,c]=hsv2rgb((Math.atan2(dy,dx)*180/Math.PI+360)%360,r/WR,cp.v);im.data.set([a,b,c,255],(y*n+x)*4)}}
   wx.putImageData(im,0,0);const a=cp.h*Math.PI/180,px=WR+Math.cos(a)*cp.s*WR,py=WR+Math.sin(a)*cp.s*WR;
   wx.beginPath();wx.arc(px,py,8,0,7);wx.lineWidth=3;wx.strokeStyle='#0008';wx.stroke();wx.beginPath();wx.arc(px,py,7,0,7);wx.lineWidth=2;wx.strokeStyle='#fff';wx.stroke()}
-function setC(){const x=toHex(...hsv2rgb(cp.h,cp.s,cp.v));S.c[cp.k]=x;$('#hex').value=x;apply();drawWheel()}
+function setC(){const x=toHex(...hsv2rgb(cp.h,cp.s,cp.v));if(cp.k==='hdc'){S.hc=x;drawHc()}else{S.c[cp.k]=x;apply()}$('#hex').value=x;drawWheel()}
 const loadHex=c=>{[cp.h,cp.s,cp.v]=rgb2hsv(...[1,3,5].map(i=>parseInt(c.substr(i,2),16)));$('#val').value=Math.round(cp.v*100)};
 document.querySelectorAll('[data-c]').forEach(i=>i.onclick=()=>{cp.k=i.dataset.c;$('#cpt').textContent=CN[cp.k];const c=curCol(cp.k);loadHex(/^#[0-9a-f]{6}$/i.test(c)?c:'#888888');$('#hex').value=c;$('#cpw').style.display='flex';drawWheel()});
 const pick=e=>{const b=wc.getBoundingClientRect(),dx=(e.clientX-b.left)/b.width*wc.width-WR,dy=(e.clientY-b.top)/b.height*wc.height-WR;cp.h=(Math.atan2(dy,dx)*180/Math.PI+360)%360;cp.s=Math.min(1,Math.hypot(dx,dy)/WR);setC()};
@@ -206,6 +225,41 @@ async function initSync(){try{const[db,u]=await Promise.all([claude.use('db'),cl
     document.querySelectorAll('[data-s]').forEach(i=>{const k=i.dataset.s;if(i.type==='checkbox')i.checked=S[k];else i.value=S[k]});corners();apply();render();$('#cs').textContent='☁ synced'}
   else if(!md||(S.ts||0)>(md.ts||0)){if(S.ts||Object.keys(S.ev).length||Object.keys(S.ph).length||Object.keys(S.st).length){S.ts=S.ts||Date.now();push()}else $('#cs').textContent='☁ synced'}
   else $('#cs').textContent='☁ synced'}catch(e){}}
+$('#rz').onpointerdown=e=>{e.preventDefault();const rz=$('#rz'),z=S.sc/100,w0=$('#frame').getBoundingClientRect().width/z,h0=S.ch,x0=e.clientX,y0=e.clientY,rows=document.querySelectorAll('#grid .day').length/7||5;
+  rz.setPointerCapture(e.pointerId);
+  rz.onpointermove=ev=>{S.cw=Math.max(220,Math.round(w0+(ev.clientX-x0)/z));S.ch=Math.max(36,Math.round(h0+(ev.clientY-y0)/z/rows));apply()};
+  rz.onpointerup=()=>{rz.onpointermove=null;document.querySelector('[data-s="ch"]').value=S.ch;save()}};
+$('#fit').onclick=()=>{S.cw=0;S.sc=100;S.ch=84;S.ox=0;S.oy=0;document.querySelectorAll('[data-s="sc"],[data-s="ch"]').forEach(i=>i.value=S[i.dataset.s]);save();apply();render()};
+/* header: photo banner above, skinny color band behind the month title (same on every month) */
+if(S.hd&&S.hd.all){const o=S.hd.all;if(o.m==='col'){if(o.col&&!S.hc)S.hc=o.col}else if(o.src&&!S.hp)S.hp={src:o.src,x:o.x,y:o.y,z:o.z};delete S.hd.all}
+const HEX=/^#[0-9a-f]{6}$/i;
+function drawHc(){const w=$('#hw'),has=HEX.test(S.hc||'');w.classList.toggle('has',has);
+  if(has){$('#hd').style.background=S.hc;const n=parseInt(S.hc.slice(1),16),lt=(.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255))/255>.62;
+    w.style.setProperty('--ht',lt?'#2b2426':'#fff');w.style.setProperty('--hs',lt?'none':'0 1px 3px #0005')}
+  $('#hcs').style.background=has?S.hc:'var(--grid)'}
+function posHd(h){const i=$('#ph .hi');if(!i)return;i.style.backgroundPosition=h.x+'% '+h.y+'%';i.style.transformOrigin=h.x+'% '+h.y+'%';i.style.transform='scale('+h.z/100+')'}
+function drawHd(){const h=S.hp,el=$('#ph');drawHc();
+  if(!h){el.className='';el.style.height='';el.innerHTML='<button class="b" id="hadd">＋ Header photo</button>';return}
+  el.className='on';el.style.height=S.hh+'px';
+  el.innerHTML='<div class="hi"></div><div class="hc"><button class="b" id="hch">Change</button><button class="b" data-z="-10">－</button><button class="b" data-z="10">＋</button><button class="b" id="hrm">Remove</button></div>';
+  $('#ph .hi').style.backgroundImage="url('"+h.src+"')";posHd(h)}
+function openHc(){cp.k='hdc';$('#cpt').textContent='Header color';const c=HEX.test(S.hc||'')?S.hc:'#e58fa8';loadHex(c);$('#hex').value=c;$('#cpw').style.display='flex';drawWheel()}
+$('#hcs').onclick=()=>{if(!HEX.test(S.hc||'')){const c=curCol('accent');S.hc=HEX.test(c)?c:'#e58fa8';drawHc();save()}openHc()};
+$('#hcx').onclick=()=>{S.hc='';drawHc();save()};
+$('#ph').addEventListener('click',e=>{const t=e.target;
+  if(t.id==='hadd'||t.id==='hch')$('#hf').click();
+  else if(t.id==='hrm'){S.hp=null;save();drawHd()}
+  else if(t.dataset.z){S.hp.z=Math.max(100,S.hp.z+ +t.dataset.z);save();posHd(S.hp)}});
+$('#hf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;S.hp={src:await shrink(f,1000),x:50,y:50,z:100};save();drawHd()};
+$('#ph').addEventListener('pointerdown',e=>{const h=S.hp;if(!h||e.target.closest('.hc'))return;e.preventDefault();
+  const el=$('#ph'),r=el.getBoundingClientRect(),x0=e.clientX,y0=e.clientY,hx=h.x,hy=h.y;el.setPointerCapture(e.pointerId);
+  el.onpointermove=ev=>{h.x=Math.min(100,Math.max(0,hx-(ev.clientX-x0)/r.width*100));h.y=Math.min(100,Math.max(0,hy-(ev.clientY-y0)/r.height*100));posHd(h)};
+  el.onpointerup=()=>{el.onpointermove=null;save()}});
+function startMove(e){e.preventDefault();const z=S.sc/100,x0=e.clientX,y0=e.clientY,ox=S.ox||0,oy=S.oy||0,t=e.currentTarget;t.setPointerCapture(e.pointerId);
+  t.onpointermove=ev=>{S.ox=Math.round(ox+(ev.clientX-x0)/z);S.oy=Math.round(oy+(ev.clientY-y0)/z);apply()};
+  t.onpointerup=()=>{t.onpointermove=null;save()}}
+$('#mv').onpointerdown=startMove;
+$('#tb').onpointerdown=e=>{if(document.body.classList.contains('retro'))startMove(e)};
 const PX="'Pixelify Sans',monospace";
 document.querySelector('[data-s="style"]').addEventListener('input',()=>{if(S.style==='retro'&&S.font!==PX)S.font=PX;else if(S.style==='plain'&&S.font===PX)S.font="'DM Sans',system-ui,sans-serif";document.querySelector('[data-s="font"]').value=S.font;save();apply();render()});
 apply();render();initSync();
