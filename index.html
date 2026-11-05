@@ -25,14 +25,14 @@ input,select{background:var(--bg);border:1px solid var(--grid);border-radius:8px
 #wk.bx+#grid{border-radius:0 0 var(--r) var(--r)}
 #grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;background:transparent;border:0;border-radius:var(--r);overflow:hidden}
 #grid.nogrid .day{box-shadow:none}
-.day{box-shadow:inset 0 0 0 .5px var(--grid);min-height:var(--ch);padding:3px;overflow:hidden;cursor:pointer;background-size:cover;background-position:center;user-select:none}
+.day{position:relative;z-index:1;box-shadow:inset 0 0 0 .5px var(--grid);min-height:var(--ch);padding:3px;overflow:hidden;cursor:pointer;background-size:cover;background-position:center;user-select:none}
 .day.blank{cursor:default;box-shadow:none}
 .n{font-size:.75rem;opacity:.85;display:inline-block}
 .td{background:var(--accent);color:#fff;border-radius:999px;padding:0 6px;opacity:1}
 .ev{font-size:.66rem;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev i{color:var(--accent);font-style:normal;margin-right:3px}
 .has .n,.has .ev{color:#fff;text-shadow:0 1px 3px #000a}
-#st{position:absolute;inset:0;pointer-events:none}
+#st{position:absolute;inset:0;pointer-events:none;z-index:4}
 .s{position:absolute;pointer-events:auto;touch-action:none;cursor:grab;user-select:none}
 .s img{width:100%;height:100%;object-fit:fill;display:block;pointer-events:none}
 .s.sel{outline:1.5px dashed var(--accent)}
@@ -77,6 +77,17 @@ body.retro .day{background-color:transparent;box-shadow:inset 0 0 0 .5px var(--g
 body.retro .day.today{outline:2px solid var(--fg);outline-offset:-2px}
 body.retro .td{background:none;color:inherit;padding:0;border-radius:0}
 body.retro .ev{text-transform:uppercase;font-size:.58rem}
+.spn{z-index:0;pointer-events:none;margin:1px;border-radius:8px;display:flex;align-items:flex-end;padding:2px 6px;font-size:.62rem;color:#fff;text-shadow:0 1px 2px #0008;background-size:cover;background-position:center;overflow:hidden}
+#cdw{display:none;width:fit-content;margin:0 auto 8px;padding:4px 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:.8rem}
+#stb{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:none;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--grid);border-radius:999px;padding:6px 10px;z-index:40}
+#yr{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
+#yg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.mm{border:1px solid var(--grid);border-radius:10px;padding:6px;cursor:pointer;font-size:.6rem}
+.mm b{display:block;font-size:.75rem;margin-bottom:2px}
+.mg{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.mg i{font-style:normal;opacity:.8}.mg .e{color:var(--accent);font-weight:700;opacity:1}.mg .t{background:var(--accent);color:#fff;border-radius:50%;opacity:1}
+input[type=range],input[type=checkbox]{accent-color:#8e8e93}
+#set{position:fixed;left:10px;right:10px;bottom:10px;max-height:42vh;overflow:auto;z-index:45;box-shadow:0 6px 24px #0004;margin:0}
 #cpw{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:55;padding:12px}
 #wheel{width:180px;height:180px;border-radius:50%;touch-action:none;cursor:crosshair;display:block;margin:8px auto}
 #ed{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
@@ -90,9 +101,13 @@ body.retro .ev{text-transform:uppercase;font-size:.58rem}
 <div id="top">
   <button class="b" id="pv">‹</button><div id="ttl"></div><button class="b" id="nx">›</button>
   <span class="sp"></span>
-  <button class="b" id="td">Today</button><button class="b a" id="ast">＋ Sticker</button><button class="b" id="gr">⚙</button><span id="cs" style="font-size:.7rem;opacity:.6"></span>
+  <button class="b" id="zo" title="Zoom out">－</button><button class="b" id="zi" title="Zoom in">＋</button><button class="b" id="yv">Year</button><button class="b" id="td">Today</button><button class="b a" id="ast">＋ Sticker</button><button class="b" id="gr">⚙</button><span id="cs" style="font-size:.7rem;opacity:.6"></span>
 </div></div>
-<div id="set">
+
+<div id="cdw"></div>
+<div id="wrap"><div id="wk"></div><div id="grid"></div><div id="st"></div></div></div><div id="rz" title="Drag to resize"></div><div id="mv" title="Drag to move">✥</div></div>
+
+<div id="set"><button class="b a" id="sx">Close</button>
   <label>Style <select data-s="style"><option value="plain">Classic</option><option value="retro">Retro window</option></select></label>
   <label>Theme <select data-s="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
   <label>Font <select data-s="font"><option value="'DM Sans',system-ui,sans-serif">DM Sans</option><option value="'Playfair Display',serif">Playfair</option><option value="'Caveat',cursive">Caveat</option><option value="'Pacifico',cursive">Pacifico</option><option value="'Space Mono',monospace">Space Mono</option><option value="'Quicksand',sans-serif">Quicksand</option><option value="'Pixelify Sans',monospace">Pixel</option></select></label>
@@ -106,22 +121,24 @@ body.retro .ev{text-transform:uppercase;font-size:.58rem}
   <label>Corners <button class="b" id="cur">Curved</button><button class="b" id="sqr">Square</button></label>
   <label><input type="checkbox" data-s="grid"> Grid</label>
   <label><input type="checkbox" data-s="title"> Title</label>
-  <label>Day height <input type="range" min="40" max="600" data-s="ch"></label><label>Scale <input type="range" min="30" max="400" data-s="sc"></label><label>Photo height <input type="range" min="40" max="500" data-s="hh"></label><label>Header color <button class="sw" id="hcs"></button></label><button class="b" id="hcx">No color</button><button class="b" id="fit">Fit to window</button>
+  <label>Day height <input type="range" min="40" max="600" data-s="ch"></label><label>Scale <input type="range" min="30" max="400" data-s="sc"></label><label>Photo height <input type="range" min="40" max="500" data-s="hh"></label><label>Header color <button class="sw" id="hcs"></button></label><button class="b" id="hcx">No color</button><label>Week starts <select data-s="ws"><option value="0">Sun</option><option value="1">Mon</option></select></label><label>Countdown <input id="cdt" placeholder="Label" style="width:96px"><input id="cdd" type="date"></label><button class="b" id="bk">Export backup</button><button class="b" id="rs">Import backup</button><button class="b" id="fit">Fit to window</button>
 </div>
-<div id="wrap"><div id="wk"></div><div id="grid"></div><div id="st"></div></div></div><div id="rz" title="Drag to resize"></div><div id="mv" title="Drag to move">✥</div></div>
-
 <div id="ed"><div class="card">
   <b id="edd"></b><div id="evl"></div>
-  <div class="row"><input id="evt" placeholder="Add event" style="flex:1;min-width:0"><input id="evm" type="time"><button class="b a" id="add">Add</button></div>
+  <div class="row"><input id="evt" placeholder="Add event" style="flex:1;min-width:0"><input id="evm" type="time"><input id="evc" type="color" value="#e58fa8" title="Event color" style="width:34px;padding:0"><button class="b a" id="add">Add</button></div>
   <div class="row"><button class="b" id="phb"></button><button class="b" id="phr">Remove photo</button><span class="sp"></span><button class="b" id="cl">Done</button></div>
+  <div class="row"><b style="font-size:.8rem">Multi-day</b><input id="spe" type="date" title="End date"><input id="spc" type="color" value="#e58fa8" style="width:34px;padding:0"></div>
+  <div class="row"><button class="b" id="spa">Add color bar</button><button class="b" id="spp">Add photo range</button></div><div id="spl"></div>
 </div></div>
 <div id="cpw"><div class="card" style="width:min(260px,100%);text-align:center"><b id="cpt"></b><canvas id="wheel" width="180" height="180"></canvas><label class="row" style="justify-content:center">Brightness <input type="range" id="val" min="0" max="100"></label><label class="row" style="justify-content:center">Opacity <input type="range" id="alpha" min="0" max="100"></label><div class="row" style="justify-content:center"><input id="hex" maxlength="9" placeholder="#hex" style="width:104px;text-align:center"><button class="b a" id="cpd">Done</button></div></div></div>
-<input type="file" accept="image/*" id="pf" hidden><input type="file" accept="image/*" id="hf" hidden><input type="file" accept="image/*" id="sf" hidden>
+<input type="file" accept="image/*" id="pf" hidden><input type="file" accept="image/*" id="hf" hidden><input type="file" accept="image/*" id="sf" hidden><input type="file" accept="image/*" id="spf" hidden><input type="file" accept="application/json,.json" id="rf" hidden>
+<div id="stb"><button class="b" data-a="front" title="Bring forward">⬆</button><button class="b" data-a="back" title="Send back">⬇</button><button class="b" data-a="flip" title="Flip">⇄</button><button class="b" data-a="dup" title="Duplicate">⧉</button><input type="range" id="sto" min="10" max="100" title="Opacity"></div>
+<div id="yr"><div class="card" style="width:min(520px,100%)"><div class="row" style="justify-content:center"><button class="b" id="yp">‹</button><b id="yt"></b><button class="b" id="yn">›</button><span class="sp"></span><button class="b" id="yc">Close</button></div><div id="yg"></div></div></div>
 <div id="toast"></div>
 
 <script>
 const $=s=>document.querySelector(s),K='cw1';
-let S={style:'plain',hd:{},hh:90,cw:0,sc:100,theme:'system',font:"'DM Sans',system-ui,sans-serif",shape:'♥',round:true,grid:true,title:true,wk:'short',ch:84,c:{},ev:{},ph:{},st:{}};
+let S={style:'plain',ws:'0',sp:[],hd:{},hh:90,cw:0,sc:100,theme:'system',font:"'DM Sans',system-ui,sans-serif",shape:'♥',round:true,grid:true,title:true,wk:'short',ch:84,c:{},ev:{},ph:{},st:{}};
 try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
 let cur=new Date();cur.setDate(1);let sel=null,dk=null;
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -133,22 +150,29 @@ function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='sys
   ['accent','bg','fg','grid'].forEach(k=>S.c[k]?r.style.setProperty('--'+k,S.c[k]):r.style.removeProperty('--'+k));paintSw()}
 function shrink(f,max){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/webp',.82))};im.src=r.result};r.readAsDataURL(f)})}
 function render(){
-  const y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate(),t=new Date();
+  const y=cur.getFullYear(),m=cur.getMonth(),ws=+S.ws||0,first=(new Date(y,m,1).getDay()-ws+7)%7,n=new Date(y,m+1,0).getDate(),t=new Date(),tot=Math.ceil((first+n)/7)*7,pos=i=>`grid-area:${Math.floor(i/7)+1}/${i%7+1}`;
   $('#ttl').textContent=S.title?cur.toLocaleDateString(undefined,{month:'long',year:'numeric'}):'';
-  $('#wk').innerHTML=[...Array(7)].map((_,i)=>`<div>${new Date(2023,0,1+i).toLocaleDateString(undefined,{weekday:S.wk==='init'?'narrow':'short'})}</div>`).join('');
-  let h='';for(let i=0;i<first;i++)h+='<div class="day blank"></div>';
+  $('#wk').innerHTML=[...Array(7)].map((_,i)=>`<div>${new Date(2023,0,1+i+ws).toLocaleDateString(undefined,{weekday:S.wk==='init'?'narrow':'short'})}</div>`).join('');
+  let h='';for(let i=0;i<first;i++)h+=`<div class="day blank" style="${pos(i)}"></div>`;
   for(let d=1;d<=n;d++){const k=key(y,m,d),e=S.ev[k]||[],p=S.ph[k],isT=t.getFullYear()==y&&t.getMonth()==m&&t.getDate()==d;
-    h+=`<div class="day${p?' has':''}${isT?' today':''}" data-k="${k}"${p?` style="background-image:url('${p}')"`:''}><span class="n${isT?' td':''}">${d}</span>`
-    +e.slice(0,3).map(x=>`<div class="ev"><i>${S.shape}</i>${x.tm?x.tm+' ':''}${esc(x.t)}</div>`).join('')+(e.length>3?`<div class="ev">+${e.length-3} more</div>`:'')+'</div>'}
-  for(let i=0;i<(7-(first+n)%7)%7;i++)h+='<div class="day blank"></div>';
-  $('#grid').className=S.grid?'':'nogrid';$('#grid').innerHTML=h;drawSt();drawHd();drawBx()}
-function drawSt(){$('#st').innerHTML=(S.st[mk()]||[]).map(s=>`<div class="s${s.id===sel?' sel':''}" data-id="${s.id}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h!=null?s.h+'%':'auto'};transform:rotate(${s.r}deg)"><img src="${s.src}" alt=""><div class="h ro">↻</div><div class="h dl">×</div><div class="h rs"></div><div class="h rw"></div><div class="h rh"></div></div>`).join('')}
+    h+=`<div class="day${p?' has':''}${isT?' today':''}" data-k="${k}" style="${pos(first+d-1)}${p?`;background-image:url('${p}')`:''}"><span class="n${isT?' td':''}">${d}</span>`
+    +e.slice(0,3).map(x=>`<div class="ev"><i${x.c?` style="color:${x.c}"`:''}>${S.shape}</i>${x.tm?x.tm+' ':''}${esc(x.t)}</div>`).join('')+(e.length>3?`<div class="ev">+${e.length-3} more</div>`:'')+'</div>'}
+  for(let i=first+n;i<tot;i++)h+=`<div class="day blank" style="${pos(i)}"></div>`;
+  (S.sp||[]).forEach(z=>{let d1=0,d2=0;for(let d=1;d<=n;d++){const k=key(y,m,d);if(k>=z.s&&k<=z.e){if(!d1)d1=d;d2=d}}
+    if(!d1)return;const i1=first+d1-1,i2=first+d2-1,r1=Math.floor(i1/7),r2=Math.floor(i2/7);
+    for(let r=r1;r<=r2;r++){const c1=r===r1?i1%7:0,c2=r===r2?i2%7:6;
+      h+=`<div class="spn" style="grid-area:${r+1}/${c1+1}/${r+2}/${c2+2};${z.src?`background-image:url('${z.src}')`:`background:${z.c}`}">${r===r1?esc(z.t||''):''}</div>`}});
+  $('#grid').className=S.grid?'':'nogrid';$('#grid').innerHTML=h;drawSt();drawHd();drawBx();drawCd()}
+function drawCd(){const el=$('#cdw');if(!S.cdd){el.style.display='none';return}
+  const d=Math.round((new Date(S.cdd+'T00:00')-new Date(new Date().toDateString()))/864e5);
+  el.style.display=d<0||isNaN(d)?'none':'block';el.textContent=d===0?'\ud83c\udf89 '+(S.cdt||'Today')+' is today!':d+' day'+(d==1?'':'s')+' until '+(S.cdt||S.cdd)}
+function drawSt(){$('#st').innerHTML=(S.st[mk()]||[]).map(s=>`<div class="s${s.id===sel?' sel':''}" data-id="${s.id}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h!=null?s.h+'%':'auto'};transform:rotate(${s.r}deg);opacity:${s.o??1}"><img src="${s.src}" alt="" style="transform:${s.f?'scaleX(-1)':'none'}"><div class="h ro">\u21bb</div><div class="h dl">\u00d7</div><div class="h rs"></div><div class="h rw"></div><div class="h rh"></div></div>`).join('');tb()}
 /* stickers */
 $('#st').addEventListener('pointerdown',e=>{
   const el=e.target.closest('.s');if(!el)return;e.preventDefault();
   const L=S.st[mk()],s=L.find(z=>z.id===el.dataset.id),c=e.target.classList;
   if(c.contains('dl')){S.st[mk()]=L.filter(z=>z!==s);sel=null;save();drawSt();return}
-  sel=s.id;document.querySelectorAll('.s').forEach(n=>n.classList.toggle('sel',n===el));
+  sel=s.id;document.querySelectorAll('.s').forEach(n=>n.classList.toggle('sel',n===el));tb();
   const W=$('#wrap').getBoundingClientRect(),b=el.getBoundingClientRect(),cx=b.left+b.width/2,cy=b.top+b.height/2;
   if(s.h==null){s.h=el.offsetHeight/W.height*100;el.style.height=s.h+'%'}
   const mode=c.contains('rs')?'rs':c.contains('rw')?'rw':c.contains('rh')?'rh':c.contains('ro')?'ro':'mv',x0=e.clientX,y0=e.clientY,sx=s.x,sy=s.y,sw=s.w,sh=s.h,d0=Math.hypot(x0-cx,y0-cy)||1,rad=s.r*Math.PI/180;
@@ -161,7 +185,7 @@ $('#st').addEventListener('pointerdown',e=>{
     else{s.r=Math.atan2(ev.clientY-cy,ev.clientX-cx)*180/Math.PI+90;el.style.transform=`rotate(${s.r}deg)`}};
   const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);save()};
   el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up)});
-document.addEventListener('pointerdown',e=>{if(!e.target.closest('.s')&&sel){sel=null;document.querySelectorAll('.s.sel').forEach(n=>n.classList.remove('sel'))}});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.s')&&!e.target.closest('#stb')&&sel){sel=null;document.querySelectorAll('.s.sel').forEach(n=>n.classList.remove('sel'));tb()}});
 $('#ast').onclick=()=>$('#sf').click();
 $('#sf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const src=await shrink(f,500),k=mk();
   const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src}),W=$('#wrap').getBoundingClientRect();
@@ -169,12 +193,12 @@ $('#sf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)re
 /* day editor */
 function drawEd(){const e=S.ev[dk]||[];
   $('#edd').textContent=new Date(dk+'T00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
-  $('#evl').innerHTML=e.map((x,i)=>`<div class="row"><span>${S.shape} ${x.tm||''} ${esc(x.t)}</span><button class="b" data-d="${i}">×</button></div>`).join('');
-  $('#phb').textContent=S.ph[dk]?'Change photo':'Add photo';$('#phr').style.display=S.ph[dk]?'':'none'}
-$('#grid').onclick=e=>{const d=e.target.closest('.day[data-k]');if(!d)return;dk=d.dataset.k;$('#ed').style.display='flex';drawEd();$('#evt').focus()};
+  $('#evl').innerHTML=e.map((x,i)=>`<div class="row"><span><i style="color:${x.c||'var(--accent)'};font-style:normal">${S.shape}</i> ${x.tm||''} ${esc(x.t)}</span><button class="b" data-d="${i}">×</button></div>`).join('');
+  $('#spl').innerHTML=(S.sp||[]).filter(z=>dk>=z.s&&dk<=z.e).map(z=>`<div class="row"><span>▬ ${esc(z.t||'range')} → ${z.e}</span><button class="b" data-sp="${z.id}">×</button></div>`).join('');$('#phb').textContent=S.ph[dk]?'Change photo':'Add photo';$('#phr').style.display=S.ph[dk]?'':'none'}
+$('#grid').onclick=e=>{const d=e.target.closest('.day[data-k]');if(!d)return;dk=d.dataset.k;const ac=curCol('accent');if(/^#[0-9a-f]{6}/i.test(ac))$('#evc').value=ac.slice(0,7);$('#spe').value='';$('#ed').style.display='flex';drawEd();$('#evt').focus()};
 const closeEd=()=>{$('#ed').style.display='none'};
 $('#cl').onclick=closeEd;$('#ed').onclick=e=>{if(e.target.id==='ed')closeEd()};
-function addEv(){const t=$('#evt').value.trim();if(!t)return;(S.ev[dk]=S.ev[dk]||[]).push({t,tm:$('#evm').value});$('#evt').value='';$('#evm').value='';save();render();drawEd()}
+function addEv(){const t=$('#evt').value.trim();if(!t)return;(S.ev[dk]=S.ev[dk]||[]).push({t,tm:$('#evm').value,c:$('#evc').value});$('#evt').value='';$('#evm').value='';save();render();drawEd()}
 $('#add').onclick=addEv;$('#evt').onkeydown=e=>{if(e.key==='Enter')addEv()};
 $('#evl').onclick=e=>{const i=e.target.dataset.d;if(i==null)return;S.ev[dk].splice(+i,1);if(!S.ev[dk].length)delete S.ev[dk];save();render();drawEd()};
 $('#phb').onclick=()=>$('#pf').click();
@@ -275,6 +299,50 @@ $('#wbs').onclick=()=>openBx('wbc','wb','Weekday bar','#d9b8c4');
 $('#gbs').onclick=()=>openBx('gbc','gb','Days box','#f6e9ee');
 $('#wbx').onclick=()=>{S.wb='';drawBx();save()};
 $('#gbx').onclick=()=>{S.gb='';drawBx();save()};
+/* multi-day ranges */
+function spAdd(src){const e=$('#spe').value;if(!e||e<dk){toast('Pick an end date first');return}(S.sp=S.sp||[]).push({id:String(Date.now()),s:dk,e,c:$('#spc').value,src:src||'',t:$('#evt').value.trim()});$('#evt').value='';save();render();drawEd()}
+$('#spa').onclick=()=>spAdd();
+$('#spp').onclick=()=>{const e=$('#spe').value;if(!e||e<dk){toast('Pick an end date first');return}$('#spf').click()};
+$('#spf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;spAdd(await shrink(f,600))};
+$('#spl').onclick=e=>{const id=e.target.dataset.sp;if(!id)return;S.sp=S.sp.filter(z=>z.id!==id);save();render();drawEd()};
+/* sticker toolbar */
+const curSt=()=>(S.st[mk()]||[]).find(z=>z.id===sel);
+function tb(){const s=curSt();$('#stb').style.display=s?'flex':'none';if(s)$('#sto').value=Math.round((s.o??1)*100)}
+$('#stb').onclick=e=>{const a=e.target.dataset.a,s=curSt();if(!a||!s)return;const L=S.st[mk()];
+  if(a==='front'){L.splice(L.indexOf(s),1);L.push(s)}else if(a==='back'){L.splice(L.indexOf(s),1);L.unshift(s)}else if(a==='flip')s.f=!s.f;
+  else if(a==='dup'){const c={...s,id:String(Date.now()),x:s.x+3,y:s.y+3};L.push(c);sel=c.id}
+  save();drawSt()};
+$('#sto').oninput=()=>{const s=curSt();if(!s)return;s.o=$('#sto').value/100;const el=document.querySelector('.s[data-id="'+sel+'"]');if(el)el.style.opacity=s.o};
+$('#sto').onchange=save;
+/* countdown */
+$('#cdt').value=S.cdt||'';$('#cdd').value=S.cdd||'';
+$('#cdt').oninput=$('#cdd').oninput=()=>{S.cdt=$('#cdt').value;S.cdd=$('#cdd').value;save();drawCd()};
+/* year view */
+let yy=new Date().getFullYear();
+function drawYr(){$('#yt').textContent=yy;const ws=+S.ws||0,t=new Date();let h='';
+  for(let m=0;m<12;m++){const first=(new Date(yy,m,1).getDay()-ws+7)%7,n=new Date(yy,m+1,0).getDate();let c='';
+    for(let i=0;i<first;i++)c+='<i></i>';
+    for(let d=1;d<=n;d++){const k=key(yy,m,d),has=(S.ev[k]||[]).length||(S.sp||[]).some(z=>k>=z.s&&k<=z.e),isT=t.getFullYear()==yy&&t.getMonth()==m&&t.getDate()==d;c+=`<i class="${has?'e':''}${isT?' t':''}">${d}</i>`}
+    h+=`<div class="mm" data-m="${m}"><b>${new Date(yy,m,1).toLocaleDateString(undefined,{month:'long'})}</b><div class="mg">${c}</div></div>`}
+  $('#yg').innerHTML=h}
+$('#yv').onclick=()=>{yy=cur.getFullYear();drawYr();$('#yr').style.display='flex'};
+$('#yp').onclick=()=>{yy--;drawYr()};$('#yn').onclick=()=>{yy++;drawYr()};$('#yc').onclick=()=>{$('#yr').style.display='none'};
+$('#yg').onclick=e=>{const m=e.target.closest('.mm');if(!m)return;cur=new Date(yy,+m.dataset.m,1);sel=null;$('#yr').style.display='none';render()};
+/* backup / restore */
+$('#bk').onclick=()=>{try{const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='calendar-backup.json';document.body.appendChild(a);a.click();a.remove();toast('Backup downloaded')}catch(e){toast('Export is blocked here \u2013 open the page directly')}};
+$('#rs').onclick=()=>$('#rf').click();
+$('#rf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const R=JSON.parse(await f.text());if(typeof R!=='object'||!R.ev)throw 0;Object.assign(S,R);save();
+  document.querySelectorAll('[data-s]').forEach(i=>{const k=i.dataset.s;if(i.type==='checkbox')i.checked=S[k];else i.value=S[k]});corners();apply();render();toast('Backup restored')}catch(x){toast('That file is not a calendar backup')}};
+/* zoom: buttons, Ctrl/Cmd + scroll, pinch */
+let zt=null,pd=0;
+function zoomBy(f){S.sc=Math.round(Math.min(400,Math.max(30,S.sc*f)));document.querySelector('[data-s="sc"]').value=S.sc;apply();clearTimeout(zt);zt=setTimeout(save,400)}
+$('#zo').onclick=()=>zoomBy(1/1.15);$('#zi').onclick=()=>zoomBy(1.15);
+document.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoomBy(e.deltaY<0?1.06:1/1.06)}},{passive:false});
+const td2=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+document.addEventListener('touchstart',e=>{if(e.touches.length===2)pd=td2(e)},{passive:true});
+document.addEventListener('touchmove',e=>{if(e.touches.length===2&&pd){e.preventDefault();const d=td2(e);zoomBy(d/pd);pd=d}},{passive:false});
+document.addEventListener('touchend',()=>{pd=0});
+$('#sx').onclick=()=>$('#set').classList.remove('on');
 const PX="'Pixelify Sans',monospace";
 document.querySelector('[data-s="style"]').addEventListener('input',()=>{if(S.style==='retro'&&S.font!==PX)S.font=PX;else if(S.style==='plain'&&S.font===PX)S.font="'DM Sans',system-ui,sans-serif";document.querySelector('[data-s="font"]').value=S.font;save();apply();render()});
 apply();render();initSync();
