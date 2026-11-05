@@ -15,7 +15,7 @@ button,input,select{font:inherit;color:var(--fg)}
 input,select{background:var(--bg);border:1px solid var(--grid);border-radius:8px;padding:3px 6px;max-width:100%}
 #top,.row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .sp{flex:1}
-#ttl{font-size:1.35rem;min-width:120px;text-align:center}
+#ttl{font-size:1.35rem;min-width:120px;text-align:center;color:var(--tc,inherit)}
 #set{display:none;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--grid);border-radius:var(--r);padding:10px;margin-bottom:8px;font-size:.8rem}
 #set.on{display:flex}
 #set label{display:flex;align-items:center;gap:4px}
@@ -52,7 +52,8 @@ body.retro #tb{cursor:move;touch-action:none}
 #hw.has #hd{border-radius:var(--r)}
 #ph.on{overflow:hidden;border-radius:var(--r);cursor:grab;touch-action:none;background:var(--grid)}
 .hi{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat;pointer-events:none}
-.hc{position:absolute;bottom:6px;right:6px;display:flex;gap:4px;z-index:3}
+.hc{position:absolute;bottom:6px;right:6px;display:flex;gap:4px;z-index:3;opacity:0;pointer-events:none;transition:opacity .15s}
+#ph.show .hc{opacity:1;pointer-events:auto}
 #hw.has{display:grid;margin-bottom:8px}
 #hw.has>*{grid-area:1/1;margin:0!important}
 #hw.has #top{position:relative;z-index:2;align-self:start;background:none!important;padding:8px 10px;pointer-events:none;color:var(--ht,#fff);text-shadow:var(--hs,0 1px 3px #0005)}
@@ -78,7 +79,6 @@ body.retro .day.today{outline:2px solid var(--fg);outline-offset:-2px}
 body.retro .td{background:none;color:inherit;padding:0;border-radius:0}
 body.retro .ev{text-transform:uppercase;font-size:.58rem}
 .spn{z-index:0;pointer-events:none;margin:1px;border-radius:8px;display:flex;align-items:flex-end;padding:2px 6px;font-size:.62rem;color:#fff;text-shadow:0 1px 2px #0008;background-size:cover;background-position:center;overflow:hidden}
-#cdw{display:none;width:fit-content;margin:0 auto 8px;padding:4px 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:.8rem}
 #stb{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:none;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--grid);border-radius:999px;padding:6px 10px;z-index:40}
 #yr{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
 #yg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
@@ -104,7 +104,6 @@ input[type=range],input[type=checkbox]{accent-color:#8e8e93}
   <button class="b" id="zo" title="Zoom out">－</button><button class="b" id="zi" title="Zoom in">＋</button><button class="b" id="yv">Year</button><button class="b" id="td">Today</button><button class="b a" id="ast">＋ Sticker</button><button class="b" id="gr">⚙</button><span id="cs" style="font-size:.7rem;opacity:.6"></span>
 </div></div>
 
-<div id="cdw"></div>
 <div id="wrap"><div id="wk"></div><div id="grid"></div><div id="st"></div></div></div><div id="rz" title="Drag to resize"></div><div id="mv" title="Drag to move">✥</div></div>
 
 <div id="set"><button class="b a" id="sx">Close</button>
@@ -116,12 +115,13 @@ input[type=range],input[type=checkbox]{accent-color:#8e8e93}
   <label>Accent <button class="sw" data-c="accent"></button></label>
   <label>Box color <button class="sw" data-c="bg"></button></label><label>Page background <button class="sw" id="pgs"></button></label><button class="b" id="pgx">None</button><label>Weekday bar <button class="sw" id="wbs"></button></label><button class="b" id="wbx">None</button><label>Days box <button class="sw" id="gbs"></button></label><button class="b" id="gbx">None</button>
   <label>Text <button class="sw" data-c="fg"></button></label>
+  <label>Month title <button class="sw" id="tcs"></button></label><button class="b" id="tcx">Default</button>
   <label>Grid <button class="sw" data-c="grid"></button></label>
   <button class="b" id="rc">Reset colors</button>
   <label>Corners <button class="b" id="cur">Curved</button><button class="b" id="sqr">Square</button></label>
   <label><input type="checkbox" data-s="grid"> Grid</label>
   <label><input type="checkbox" data-s="title"> Title</label>
-  <label>Day height <input type="range" min="40" max="600" data-s="ch"></label><label>Scale <input type="range" min="30" max="400" data-s="sc"></label><label>Photo height <input type="range" min="40" max="500" data-s="hh"></label><label>Header color <button class="sw" id="hcs"></button></label><button class="b" id="hcx">No color</button><label>Week starts <select data-s="ws"><option value="0">Sun</option><option value="1">Mon</option></select></label><label>Countdown <input id="cdt" placeholder="Label" style="width:96px"><input id="cdd" type="date"></label><button class="b" id="bk">Export backup</button><button class="b" id="rs">Import backup</button><button class="b" id="fit">Fit to window</button>
+  <label>Day height <input type="range" min="40" max="600" data-s="ch"></label><label>Scale <input type="range" min="30" max="400" data-s="sc"></label><label>Photo height <input type="range" min="40" max="500" data-s="hh"></label><label>Header color <button class="sw" id="hcs"></button></label><button class="b" id="hcx">No color</button><label>Week starts <select data-s="ws"><option value="0">Sun</option><option value="1">Mon</option></select></label><button class="b" id="bk">Export backup</button><button class="b" id="rs">Import backup</button><button class="b" id="fit">Fit to window</button>
 </div>
 <div id="ed"><div class="card">
   <b id="edd"></b><div id="evl"></div>
@@ -145,7 +145,7 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const pad=n=>String(n).padStart(2,'0'),key=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`,mk=()=>`${cur.getFullYear()}-${pad(cur.getMonth()+1)}`;
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2600)}
 function save(){S.ts=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){if(!DB)toast('Storage full – remove some photos')}push()}
-function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;S.pg?r.style.setProperty('--pg',S.pg):r.style.removeProperty('--pg');document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'px':'';fr.style.zoom=S.sc/100;fr.style.left=(S.ox||0)+'px';fr.style.top=(S.oy||0)+'px';
+function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;S.pg?r.style.setProperty('--pg',S.pg):r.style.removeProperty('--pg');S.tc?r.style.setProperty('--tc',S.tc):r.style.removeProperty('--tc');document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'px':'';fr.style.zoom=S.sc/100;fr.style.left=(S.ox||0)+'px';fr.style.top=(S.oy||0)+'px';
   r.style.setProperty('--font',S.font);r.style.setProperty('--ch',S.ch+'px');r.style.setProperty('--r',S.round?'14px':'0px');
   ['accent','bg','fg','grid'].forEach(k=>S.c[k]?r.style.setProperty('--'+k,S.c[k]):r.style.removeProperty('--'+k));paintSw()}
 function shrink(f,max){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/webp',.82))};im.src=r.result};r.readAsDataURL(f)})}
@@ -162,10 +162,7 @@ function render(){
     if(!d1)return;const i1=first+d1-1,i2=first+d2-1,r1=Math.floor(i1/7),r2=Math.floor(i2/7);
     for(let r=r1;r<=r2;r++){const c1=r===r1?i1%7:0,c2=r===r2?i2%7:6;
       h+=`<div class="spn" style="grid-area:${r+1}/${c1+1}/${r+2}/${c2+2};${z.src?`background-image:url('${z.src}')`:`background:${z.c}`}">${r===r1?esc(z.t||''):''}</div>`}});
-  $('#grid').className=S.grid?'':'nogrid';$('#grid').innerHTML=h;drawSt();drawHd();drawBx();drawCd()}
-function drawCd(){const el=$('#cdw');if(!S.cdd){el.style.display='none';return}
-  const d=Math.round((new Date(S.cdd+'T00:00')-new Date(new Date().toDateString()))/864e5);
-  el.style.display=d<0||isNaN(d)?'none':'block';el.textContent=d===0?'\ud83c\udf89 '+(S.cdt||'Today')+' is today!':d+' day'+(d==1?'':'s')+' until '+(S.cdt||S.cdd)}
+  $('#grid').className=S.grid?'':'nogrid';$('#grid').innerHTML=h;drawSt();drawHd();drawBx()}
 function drawSt(){$('#st').innerHTML=(S.st[mk()]||[]).map(s=>`<div class="s${s.id===sel?' sel':''}" data-id="${s.id}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h!=null?s.h+'%':'auto'};transform:rotate(${s.r}deg);opacity:${s.o??1}"><img src="${s.src}" alt="" style="transform:${s.f?'scaleX(-1)':'none'}"><div class="h ro">\u21bb</div><div class="h dl">\u00d7</div><div class="h rs"></div><div class="h rw"></div><div class="h rh"></div></div>`).join('');tb()}
 /* stickers */
 $('#st').addEventListener('pointerdown',e=>{
@@ -214,7 +211,7 @@ document.querySelectorAll('[data-s]').forEach(i=>{const k=i.dataset.s,cb=i.type=
   i.oninput=()=>{S[k]=cb?i.checked:i.type==='range'?+i.value:i.value;save();apply();render()}});
 /* color wheel */
 const curCol=k=>S.c[k]||getComputedStyle(document.documentElement).getPropertyValue('--'+k).trim()||'#888888';
-function paintSw(){document.querySelectorAll('[data-c]').forEach(i=>i.style.background=curCol(i.dataset.c));$('#pgs').style.background=S.pg||'repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 0 0/10px 10px'}
+function paintSw(){document.querySelectorAll('[data-c]').forEach(i=>i.style.background=curCol(i.dataset.c));$('#pgs').style.background=S.pg||'repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 0 0/10px 10px';$('#tcs').style.background=S.tc||'repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 0 0/10px 10px'}
 const hsv2rgb=(h,s,v)=>{const f=n=>{const k=(n+h/60)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1))};return[f(5),f(3),f(1)].map(x=>Math.round(x*255))};
 const toHex=(r,g,b)=>'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
 function rgb2hsv(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return[h,mx?d/mx:0,mx]}
@@ -224,7 +221,7 @@ function drawWheel(){const n=wc.width,im=wx.createImageData(n,n);
   for(let y=0;y<n;y++)for(let x=0;x<n;x++){const dx=x-WR+.5,dy=y-WR+.5,r=Math.hypot(dx,dy);if(r<=WR){const[a,b,c]=hsv2rgb((Math.atan2(dy,dx)*180/Math.PI+360)%360,r/WR,cp.v);im.data.set([a,b,c,255],(y*n+x)*4)}}
   wx.putImageData(im,0,0);const a=cp.h*Math.PI/180,px=WR+Math.cos(a)*cp.s*WR,py=WR+Math.sin(a)*cp.s*WR;
   wx.beginPath();wx.arc(px,py,8,0,7);wx.lineWidth=3;wx.strokeStyle='#0008';wx.stroke();wx.beginPath();wx.arc(px,py,7,0,7);wx.lineWidth=2;wx.strokeStyle='#fff';wx.stroke()}
-function setC(skip){const x=toHex(...hsv2rgb(cp.h,cp.s,cp.v))+(cp.a<1?Math.round(cp.a*255).toString(16).padStart(2,'0'):'');if(cp.k==='hdc'){S.hc=x;drawHc()}else if(cp.k==='pgc'){S.pg=x;apply()}else if(cp.k==='wbc'){S.wb=x;drawBx()}else if(cp.k==='gbc'){S.gb=x;drawBx()}else{S.c[cp.k]=x;apply()}if(!skip)$('#hex').value=x;drawWheel()}
+function setC(skip){const x=toHex(...hsv2rgb(cp.h,cp.s,cp.v))+(cp.a<1?Math.round(cp.a*255).toString(16).padStart(2,'0'):'');if(cp.k==='hdc'){S.hc=x;drawHc()}else if(cp.k==='pgc'){S.pg=x;apply()}else if(cp.k==='tcc'){S.tc=x;apply()}else if(cp.k==='wbc'){S.wb=x;drawBx()}else if(cp.k==='gbc'){S.gb=x;drawBx()}else{S.c[cp.k]=x;apply()}if(!skip)$('#hex').value=x;drawWheel()}
 const loadHex=c=>{[cp.h,cp.s,cp.v]=rgb2hsv(...[1,3,5].map(i=>parseInt(c.substr(i,2),16)));$('#val').value=Math.round(cp.v*100);cp.a=c.length>7?parseInt(c.substr(7,2),16)/255:1;$('#alpha').value=Math.round(cp.a*100)};
 document.querySelectorAll('[data-c]').forEach(i=>i.onclick=()=>{cp.k=i.dataset.c;$('#cpt').textContent=CN[cp.k];const c=curCol(cp.k);loadHex(HEX.test(c)?c:'#888888');$('#hex').value=c;$('#cpw').style.display='flex';drawWheel()});
 const pick=e=>{const b=wc.getBoundingClientRect(),dx=(e.clientX-b.left)/b.width*wc.width-WR,dy=(e.clientY-b.top)/b.height*wc.height-WR;cp.h=(Math.atan2(dy,dx)*180/Math.PI+360)%360;cp.s=Math.min(1,Math.hypot(dx,dy)/WR);setC()};
@@ -239,7 +236,7 @@ $('#cpd').onclick=closeCp;$('#cpw').onclick=e=>{if(e.target.id==='cpw')closeCp()
 /* corners */
 const corners=()=>{$('#cur').classList.toggle('a',S.round);$('#sqr').classList.toggle('a',!S.round)};
 $('#cur').onclick=()=>{S.round=true;save();apply();corners()};$('#sqr').onclick=()=>{S.round=false;save();apply();corners()};corners();
-$('#rc').onclick=()=>{S.c={};S.pg='';S.hc='';S.wb='';S.gb='';save();apply();drawHc();drawBx()};
+$('#rc').onclick=()=>{S.c={};S.pg='';S.tc='';S.hc='';S.wb='';S.gb='';save();apply();drawHc();drawBx()};
 /* cloud sync (only when opened signed in to claude.ai; otherwise stays on-device) */
 let DB=null,UID=null,pt=null,lastW=[];const CH=180000;
 const ser=()=>JSON.stringify(S).replace(/[\u007f-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
@@ -281,8 +278,9 @@ $('#ph').addEventListener('click',e=>{const t=e.target;
 $('#hf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;S.hp={src:await shrink(f,1000),x:50,y:50,z:100};save();drawHd()};
 $('#ph').addEventListener('pointerdown',e=>{const h=S.hp;if(!h||e.target.closest('.hc'))return;e.preventDefault();
   const el=$('#ph'),r=el.getBoundingClientRect(),x0=e.clientX,y0=e.clientY,hx=h.x,hy=h.y;el.setPointerCapture(e.pointerId);
-  el.onpointermove=ev=>{h.x=Math.min(100,Math.max(0,hx-(ev.clientX-x0)/r.width*100));h.y=Math.min(100,Math.max(0,hy-(ev.clientY-y0)/r.height*100));posHd(h)};
-  el.onpointerup=()=>{el.onpointermove=null;save()}});
+  let mvd=false;
+  el.onpointermove=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>4)mvd=true;h.x=Math.min(100,Math.max(0,hx-(ev.clientX-x0)/r.width*100));h.y=Math.min(100,Math.max(0,hy-(ev.clientY-y0)/r.height*100));posHd(h)};
+  el.onpointerup=()=>{el.onpointermove=null;if(!mvd)el.classList.toggle('show');save()}});
 function startMove(e){e.preventDefault();const z=S.sc/100,x0=e.clientX,y0=e.clientY,ox=S.ox||0,oy=S.oy||0,t=e.currentTarget;t.setPointerCapture(e.pointerId);
   t.onpointermove=ev=>{S.ox=Math.round(ox+(ev.clientX-x0)/z);S.oy=Math.round(oy+(ev.clientY-y0)/z);apply()};
   t.onpointerup=()=>{t.onpointermove=null;save()}}
@@ -290,6 +288,9 @@ $('#mv').onpointerdown=startMove;
 $('#tb').onpointerdown=e=>{if(document.body.classList.contains('retro'))startMove(e)};
 $('#pgs').onclick=()=>{if(!S.pg){S.pg='#f3eaec';apply()}cp.k='pgc';$('#cpt').textContent='Page background';loadHex(S.pg);$('#hex').value=S.pg;$('#cpw').style.display='flex';drawWheel()};
 $('#pgx').onclick=()=>{S.pg='';apply();save()};
+/* month title color */
+$('#tcs').onclick=()=>{if(!HEX.test(S.tc||'')){const c=curCol('fg');S.tc=HEX.test(c)?c:'#3b3335';apply();save()}cp.k='tcc';$('#cpt').textContent='Month title';loadHex(S.tc);$('#hex').value=S.tc;$('#cpw').style.display='flex';drawWheel()};
+$('#tcx').onclick=()=>{S.tc='';apply();save()};
 function drawBx(){const w=$('#wk'),g=$('#grid'),ck='repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 0 0/10px 10px',hw=HEX.test(S.wb||''),hg=HEX.test(S.gb||'');
   w.classList.toggle('bx',hw);w.style.background=hw?S.wb:'';
   if(hw){const n=parseInt(S.wb.slice(1,7),16);w.style.color=(.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255))/255>.62?'#2b2426':'#fff'}else w.style.color='';
@@ -314,9 +315,6 @@ $('#stb').onclick=e=>{const a=e.target.dataset.a,s=curSt();if(!a||!s)return;cons
   save();drawSt()};
 $('#sto').oninput=()=>{const s=curSt();if(!s)return;s.o=$('#sto').value/100;const el=document.querySelector('.s[data-id="'+sel+'"]');if(el)el.style.opacity=s.o};
 $('#sto').onchange=save;
-/* countdown */
-$('#cdt').value=S.cdt||'';$('#cdd').value=S.cdd||'';
-$('#cdt').oninput=$('#cdd').oninput=()=>{S.cdt=$('#cdt').value;S.cdd=$('#cdd').value;save();drawCd()};
 /* year view */
 let yy=new Date().getFullYear();
 function drawYr(){$('#yt').textContent=yy;const ws=+S.ws||0,t=new Date();let h='';
