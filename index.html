@@ -146,7 +146,7 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const pad=n=>String(n).padStart(2,'0'),key=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`,mk=()=>`${cur.getFullYear()}-${pad(cur.getMonth()+1)}`;
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2600)}
 function save(){S.ts=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){if(!DB)toast('Storage full – remove some photos')}push()}
-function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;S.pg?r.style.setProperty('--pg',S.pg):r.style.removeProperty('--pg');S.tc?r.style.setProperty('--tc',S.tc):r.style.removeProperty('--tc');document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'%':'';fr.style.zoom=S.sc/100;fr.style.left=(S.ox||0)+'px';fr.style.top=(S.oy||0)+'px';
+function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;S.pg?r.style.setProperty('--pg',S.pg):r.style.removeProperty('--pg');S.tc?r.style.setProperty('--tc',S.tc):r.style.removeProperty('--tc');document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'%':'';fr.style.zoom=S.sc/100;fr.style.left=Math.max(0,S.ox||0)+'px';fr.style.top=Math.max(0,S.oy||0)+'px';
   r.style.setProperty('--font',S.font);r.style.setProperty('--ch',S.ch+'px');r.style.setProperty('--r',S.round?'14px':'0px');
   ['accent','bg','fg','grid'].forEach(k=>S.c[k]?r.style.setProperty('--'+k,S.c[k]):r.style.removeProperty('--'+k));paintSw()}
 function shrink(f,max){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/webp',.82))};im.src=r.result};r.readAsDataURL(f)})}
@@ -284,7 +284,7 @@ $('#ph').addEventListener('pointerdown',e=>{const h=S.hp;if(!h||e.target.closest
   el.onpointermove=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>4)mvd=true;h.x=Math.min(100,Math.max(0,hx-(ev.clientX-x0)/r.width*100));h.y=Math.min(100,Math.max(0,hy-(ev.clientY-y0)/r.height*100));posHd(h)};
   el.onpointerup=()=>{el.onpointermove=null;if(!mvd)el.classList.toggle('show');save()}});
 function startMove(e){e.preventDefault();const z=S.sc/100,x0=e.clientX,y0=e.clientY,ox=S.ox||0,oy=S.oy||0,t=e.currentTarget;t.setPointerCapture(e.pointerId);
-  t.onpointermove=ev=>{S.ox=Math.round(ox+(ev.clientX-x0)/z);S.oy=Math.round(oy+(ev.clientY-y0)/z);apply()};
+  t.onpointermove=ev=>{S.ox=Math.max(0,Math.round(ox+(ev.clientX-x0)/z));S.oy=Math.max(0,Math.round(oy+(ev.clientY-y0)/z));apply()};
   t.onpointerup=()=>{t.onpointermove=null;save()}}
 $('#mv').onpointerdown=startMove;
 $('#tb').onpointerdown=e=>{if(document.body.classList.contains('retro'))startMove(e)};
