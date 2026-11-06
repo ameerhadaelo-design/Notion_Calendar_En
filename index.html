@@ -25,7 +25,7 @@ input,select{background:var(--bg);border:1px solid var(--grid);border-radius:8px
 #wk.bx+#grid{border-radius:0 0 var(--r) var(--r)}
 #grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;background:transparent;border:0;border-radius:var(--r);overflow:hidden}
 #grid.nogrid .day{box-shadow:none}
-.day{position:relative;z-index:1;box-shadow:inset 0 0 0 .5px var(--grid);min-height:calc(var(--ch) * 100cqw / 450);padding:3px;overflow:hidden;cursor:pointer;background-size:cover;background-position:center;user-select:none}
+.day{position:relative;z-index:1;box-shadow:inset 0 0 0 .5px var(--grid);min-height:var(--ch);padding:3px;overflow:hidden;cursor:pointer;background-size:cover;background-position:center;user-select:none}
 .day.blank{cursor:default;box-shadow:none}
 .n{font-size:.75rem;opacity:.85;display:inline-block}
 .td{background:var(--accent);color:#fff;border-radius:999px;padding:0 6px;opacity:1}
@@ -44,7 +44,7 @@ input,select{background:var(--bg);border:1px solid var(--grid);border-radius:8px
 .ro{left:calc(50% - 9px);top:-30px;cursor:grab}
 .dl{right:-9px;top:-9px;cursor:pointer}
 .sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--grid);cursor:pointer;padding:0}
-#frame{position:relative;box-sizing:border-box;container-type:inline-size;background:var(--bg);border:1px solid var(--grid);border-radius:var(--r);padding:12px}
+#frame{position:relative;box-sizing:border-box;background:var(--bg);border:1px solid var(--grid);border-radius:var(--r);padding:12px}
 #mv{position:absolute;left:-8px;top:-8px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;text-align:center;line-height:24px;font-size:13px;cursor:move;touch-action:none;z-index:6;opacity:.9;user-select:none}
 body.retro #tb{cursor:move;touch-action:none}
 #ph{position:relative;margin-bottom:8px}
@@ -140,13 +140,12 @@ input[type=range],input[type=checkbox]{accent-color:#8e8e93}
 const $=s=>document.querySelector(s),K='cw1';
 let S={style:'plain',ws:'0',sp:[],hd:{},hh:90,cw:0,sc:100,theme:'system',font:"'DM Sans',system-ui,sans-serif",shape:'♥',round:true,grid:true,title:true,wk:'short',ch:84,c:{},ev:{},ph:{},st:{}};
 try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
-if(S.cw>100)S.cw=0; /* old saves stored pixels; width is now a % of the embed */
 let cur=new Date();cur.setDate(1);let sel=null,dk=null;
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pad=n=>String(n).padStart(2,'0'),key=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`,mk=()=>`${cur.getFullYear()}-${pad(cur.getMonth()+1)}`;
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2600)}
 function save(){S.ts=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){if(!DB)toast('Storage full – remove some photos')}push()}
-function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;S.pg?r.style.setProperty('--pg',S.pg):r.style.removeProperty('--pg');S.tc?r.style.setProperty('--tc',S.tc):r.style.removeProperty('--tc');document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'%':'';fr.style.zoom=S.sc/100;fr.style.left=Math.max(0,S.ox||0)+'px';fr.style.top=Math.max(0,S.oy||0)+'px';
+function apply(){const r=document.documentElement;r.dataset.theme=S.theme==='system'?'':S.theme;S.pg?r.style.setProperty('--pg',S.pg):r.style.removeProperty('--pg');S.tc?r.style.setProperty('--tc',S.tc):r.style.removeProperty('--tc');document.body.classList.toggle('retro',S.style==='retro');const fr=$('#frame');fr.style.width=S.cw?S.cw+'px':'';fr.style.zoom=S.sc/100;fr.style.left=(S.ox||0)+'px';fr.style.top=(S.oy||0)+'px';
   r.style.setProperty('--font',S.font);r.style.setProperty('--ch',S.ch+'px');r.style.setProperty('--r',S.round?'14px':'0px');
   ['accent','bg','fg','grid'].forEach(k=>S.c[k]?r.style.setProperty('--'+k,S.c[k]):r.style.removeProperty('--'+k));paintSw()}
 function shrink(f,max){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/webp',.82))};im.src=r.result};r.readAsDataURL(f)})}
@@ -247,14 +246,13 @@ function push(){if(!DB)return;clearTimeout(pt);pt=setTimeout(async()=>{try{const
 async function initSync(){try{const[db,u]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!u)return;const id=await u.id();if(!id)return;DB=db;UID=id;
   const b='data/users/'+id+'/',m=await DB.doc(b+'calmeta').get(),md=m.exists?m.data():null;
   if(md&&(md.ts||0)>(S.ts||0)){let s='';for(let i=0;i<md.n;i++){const c=await DB.doc(b+'calc'+i).get();s+=c.data().d;lastW[i]=c.data().d}
-    Object.assign(S,JSON.parse(s));if(S.cw>100)S.cw=0;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}
+    Object.assign(S,JSON.parse(s));try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}
     document.querySelectorAll('[data-s]').forEach(i=>{const k=i.dataset.s;if(i.type==='checkbox')i.checked=S[k];else i.value=S[k]});corners();apply();render();$('#cs').textContent='☁ synced'}
   else if(!md||(S.ts||0)>(md.ts||0)){if(S.ts||Object.keys(S.ev).length||Object.keys(S.ph).length||Object.keys(S.st).length){S.ts=S.ts||Date.now();push()}else $('#cs').textContent='☁ synced'}
   else $('#cs').textContent='☁ synced'}catch(e){}}
-/* resize corner: width is stored as % of the embed, day height scales with width */
-$('#rz').onpointerdown=e=>{e.preventDefault();const rz=$('#rz'),z=S.sc/100,w0=$('#frame').getBoundingClientRect().width/z,h0=S.ch,x0=e.clientX,y0=e.clientY,rows=document.querySelectorAll('#grid .day').length/7||5,pw=Math.max(1,document.body.clientWidth-20);
+$('#rz').onpointerdown=e=>{e.preventDefault();const rz=$('#rz'),z=S.sc/100,w0=$('#frame').getBoundingClientRect().width/z,h0=S.ch,x0=e.clientX,y0=e.clientY,rows=document.querySelectorAll('#grid .day').length/7||5;
   rz.setPointerCapture(e.pointerId);
-  rz.onpointermove=ev=>{S.cw=Math.min(100,Math.max(30,Math.round((w0+(ev.clientX-x0)/z)/pw*100)));S.ch=Math.max(36,Math.round(h0+(ev.clientY-y0)/z/rows*450/w0));apply()};
+  rz.onpointermove=ev=>{S.cw=Math.max(220,Math.round(w0+(ev.clientX-x0)/z));S.ch=Math.max(36,Math.round(h0+(ev.clientY-y0)/z/rows));apply()};
   rz.onpointerup=()=>{rz.onpointermove=null;document.querySelector('[data-s="ch"]').value=S.ch;save()}};
 $('#fit').onclick=()=>{S.cw=0;S.sc=100;S.ch=84;S.ox=0;S.oy=0;document.querySelectorAll('[data-s="sc"],[data-s="ch"]').forEach(i=>i.value=S[i.dataset.s]);save();apply();render()};
 /* header: photo banner above, skinny color band behind the month title (same on every month) */
@@ -284,7 +282,7 @@ $('#ph').addEventListener('pointerdown',e=>{const h=S.hp;if(!h||e.target.closest
   el.onpointermove=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>4)mvd=true;h.x=Math.min(100,Math.max(0,hx-(ev.clientX-x0)/r.width*100));h.y=Math.min(100,Math.max(0,hy-(ev.clientY-y0)/r.height*100));posHd(h)};
   el.onpointerup=()=>{el.onpointermove=null;if(!mvd)el.classList.toggle('show');save()}});
 function startMove(e){e.preventDefault();const z=S.sc/100,x0=e.clientX,y0=e.clientY,ox=S.ox||0,oy=S.oy||0,t=e.currentTarget;t.setPointerCapture(e.pointerId);
-  t.onpointermove=ev=>{S.ox=Math.max(0,Math.round(ox+(ev.clientX-x0)/z));S.oy=Math.max(0,Math.round(oy+(ev.clientY-y0)/z));apply()};
+  t.onpointermove=ev=>{S.ox=Math.round(ox+(ev.clientX-x0)/z);S.oy=Math.round(oy+(ev.clientY-y0)/z);apply()};
   t.onpointerup=()=>{t.onpointermove=null;save()}}
 $('#mv').onpointerdown=startMove;
 $('#tb').onpointerdown=e=>{if(document.body.classList.contains('retro'))startMove(e)};
@@ -331,12 +329,17 @@ $('#yg').onclick=e=>{const m=e.target.closest('.mm');if(!m)return;cur=new Date(y
 /* backup / restore */
 $('#bk').onclick=()=>{try{const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='calendar-backup.json';document.body.appendChild(a);a.click();a.remove();toast('Backup downloaded')}catch(e){toast('Export is blocked here \u2013 open the page directly')}};
 $('#rs').onclick=()=>$('#rf').click();
-$('#rf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const R=JSON.parse(await f.text());if(typeof R!=='object'||!R.ev)throw 0;Object.assign(S,R);if(S.cw>100)S.cw=0;save();
+$('#rf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const R=JSON.parse(await f.text());if(typeof R!=='object'||!R.ev)throw 0;Object.assign(S,R);save();
   document.querySelectorAll('[data-s]').forEach(i=>{const k=i.dataset.s;if(i.type==='checkbox')i.checked=S[k];else i.value=S[k]});corners();apply();render();toast('Backup restored')}catch(x){toast('That file is not a calendar backup')}};
-/* zoom: buttons only (pinch and Ctrl+scroll removed so it can't shrink by accident) */
-let zt=null;
+/* zoom: buttons, Ctrl/Cmd + scroll, pinch */
+let zt=null,pd=0;
 function zoomBy(f){S.sc=Math.round(Math.min(400,Math.max(30,S.sc*f)));document.querySelector('[data-s="sc"]').value=S.sc;apply();clearTimeout(zt);zt=setTimeout(save,400)}
 $('#zo').onclick=()=>zoomBy(1/1.15);$('#zi').onclick=()=>zoomBy(1.15);
+document.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoomBy(e.deltaY<0?1.06:1/1.06)}},{passive:false});
+const td2=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+document.addEventListener('touchstart',e=>{if(e.touches.length===2)pd=td2(e)},{passive:true});
+document.addEventListener('touchmove',e=>{if(e.touches.length===2&&pd){e.preventDefault();const d=td2(e);zoomBy(d/pd);pd=d}},{passive:false});
+document.addEventListener('touchend',()=>{pd=0});
 $('#sx').onclick=()=>$('#set').classList.remove('on');
 const PX="'Pixelify Sans',monospace";
 document.querySelector('[data-s="style"]').addEventListener('input',()=>{if(S.style==='retro'&&S.font!==PX)S.font=PX;else if(S.style==='plain'&&S.font===PX)S.font="'DM Sans',system-ui,sans-serif";document.querySelector('[data-s="font"]').value=S.font;save();apply();render()});
